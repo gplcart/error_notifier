@@ -1,0 +1,16 @@
+{
+    "name": "Error Notifier",
+    "version": "1.0.0-dev",
+    "description": "Extends GPL Cart error logging system",
+    "author": "Iurii Makukh <gplcart.software@gmail.com>",
+    "core": "1.x",
+    "license": "GPL-3.0+",
+    "configure": "admin/module/settings/error_notifier",
+    "settings": {
+        "live": 0,
+        "email": false,
+        "recipient": [],
+        "live_limit": "20",
+        "email_limit": "100"
+    }
+}
