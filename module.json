@@ -10,7 +10,7 @@
         "live": 0,
         "email": false,
         "recipient": [],
-        "live_limit": "20",
-        "email_limit": "100"
+        "live_limit": 10,
+        "email_limit": 100
     }
 }
