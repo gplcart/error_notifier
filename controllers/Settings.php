@@ -45,13 +45,21 @@ class Settings extends BackendController
         $this->setData('settings', $this->config->module('error_notifier'));
 
         $this->submitSettings();
+        $this->prepareDataEditSettings();
+
+        $this->outputEditSettings();
+    }
+
+    /**
+     * Prepare data before passing to templates
+     */
+    protected function prepareDataEditSettings()
+    {
         $recipients = $this->getData('settings.recipient');
 
         if (is_array($recipients)) {
             $this->setData('settings.recipient', implode("\n", $recipients));
         }
-
-        $this->outputEditSettings();
     }
 
     /**
@@ -100,11 +108,18 @@ class Settings extends BackendController
     protected function validateSettings()
     {
         $this->setSubmitted('settings');
-        $this->setSubmittedArray('recipient');
         $this->setSubmittedBool('email');
 
-        $this->validateElement('live_limit', 'numeric');
-        $this->validateElement('email_limit', 'numeric');
+        $this->validateElement('live_limit', 'integer');
+        $this->validateElement('email_limit', 'integer');
+
+        foreach ($this->setSubmittedArray('recipient') as $email) {
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $message = $this->text('@field has invalid value', array('@field' => $this->text('Recipients')));
+                $this->setError('recipient', $message);
+                break;
+            }
+        }
 
         return !$this->hasErrors();
     }

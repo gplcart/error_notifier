@@ -7,7 +7,7 @@
     "license": "GPL-3.0+",
     "configure": "admin/module/settings/error_notifier",
     "settings": {
-        "live": 0,
+        "live": 1,
         "email": false,
         "recipient": [],
         "live_limit": 10,

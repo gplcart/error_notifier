@@ -57,6 +57,7 @@ class ErrorNotifier extends Module
     public function hookTemplate($template, array &$data, $controller)
     {
         $limit = 'layout/body';
+
         if (substr($template, -strlen($limit)) === $limit) {
             $this->setLiveReport($data, $controller);
         }
@@ -69,8 +70,9 @@ class ErrorNotifier extends Module
     protected function setEmailReport($controller)
     {
         $settings = $this->config->module('error_notifier');
+
         if (!empty($settings['email']) && !empty($settings['recipient'])) {
-            $messages = $this->getEmailErrorMessages($settings, $controller);
+            $messages = $this->getEmailErrors($settings, $controller);
             if (!empty($messages)) {
                 $this->sendEmail($settings, $messages, $controller);
             }
@@ -101,7 +103,7 @@ class ErrorNotifier extends Module
      * @param \gplcart\core\Controller $controller
      * @return array
      */
-    protected function getEmailErrorMessages(array $settings, $controller)
+    protected function getEmailErrors(array $settings, $controller)
     {
         if (empty($settings['email_limit'])) {
             $settings['email_limit'] = null; // Unlimited
@@ -111,7 +113,7 @@ class ErrorNotifier extends Module
         $logger = $this->getInstance('gplcart\\core\\Logger');
         $errors = $logger->selectPhpErrors($settings['email_limit']);
 
-        return $this->getFormattedErrorMessages($errors, $controller);
+        return $this->getFormattedErrors($errors, $controller);
     }
 
     /**
@@ -122,7 +124,7 @@ class ErrorNotifier extends Module
     protected function setLiveReport(array &$data, $controller)
     {
         $settings = $this->config->module('error_notifier');
-        $messages = $this->getLiveErrorMessages($settings, $controller);
+        $messages = $this->getLiveErrors($settings, $controller);
 
         if (empty($messages)) {
             return null;
@@ -161,6 +163,7 @@ class ErrorNotifier extends Module
                 $vars = array('@href' => $controller->url('admin/report/events', array('clear' => true, 'target' => $controller->path())));
                 $message .= ' | ' . $controller->text('<a href="@href">clear all saved errors</a>', $vars);
             }
+
             $messages[] = $message;
         }
     }
@@ -171,7 +174,7 @@ class ErrorNotifier extends Module
      * @param \gplcart\core\Controller $controller
      * @return array
      */
-    protected function getLiveErrorMessages(array $settings, $controller)
+    protected function getLiveErrors(array $settings, $controller)
     {
         if (empty($settings['live'])) {
             return array();
@@ -187,7 +190,7 @@ class ErrorNotifier extends Module
             $errors = $logger->selectPhpErrors();
         }
 
-        return $this->getFormattedErrorMessages($errors, $controller);
+        return $this->getFormattedErrors($errors, $controller);
     }
 
     /**
@@ -196,7 +199,7 @@ class ErrorNotifier extends Module
      * @param \gplcart\core\Controller $controller
      * @return array
      */
-    protected function getFormattedErrorMessages(array $errors, $controller)
+    protected function getFormattedErrors(array $errors, $controller)
     {
         $messages = array();
         foreach ($errors as $error) {
@@ -207,6 +210,7 @@ class ErrorNotifier extends Module
             );
             $messages[] = $controller->text('@message on line @line in @file', $vars);
         }
+
         return $messages;
     }
 
