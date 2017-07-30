@@ -88,7 +88,7 @@ class ErrorNotifier extends Module
     protected function sendEmail(array $settings, array $messages, $controller)
     {
         /* @var $mailer \gplcart\core\models\Mail */
-        $mailer = $this->getInstance('gplcart\\core\\models\Mail');
+        $mailer = $this->getModel('Mail');
 
         $subject = 'Last PHP errors';
         $body = implode("\r\n", $messages);
