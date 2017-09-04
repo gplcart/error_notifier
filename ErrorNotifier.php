@@ -56,27 +56,29 @@ class ErrorNotifier extends Module
      */
     public function hookTemplate($template, array &$data, $controller)
     {
-        $limit = 'layout/body';
-
-        if (substr($template, -strlen($limit)) === $limit) {
-            $this->setLiveReport($data, $controller);
-        }
+        $this->setLiveReport($template, $data, $controller);
     }
 
     /**
      * Sends last PHP errors via Email
      * @param \gplcart\core\Controller $controller
+     * @return bool
      */
     protected function setEmailReport($controller)
     {
         $settings = $this->config->module('error_notifier');
 
-        if (!empty($settings['email']) && !empty($settings['recipient'])) {
-            $messages = $this->getEmailErrors($settings, $controller);
-            if (!empty($messages)) {
-                $this->sendEmail($settings, $messages, $controller);
-            }
+        if (empty($settings['email']) || empty($settings['recipient'])) {
+            return false;
         }
+
+        $messages = $this->getEmailErrors($settings, $controller);
+
+        if (empty($messages)) {
+            return false;
+        }
+
+        return $this->sendEmail($settings, $messages, $controller);
     }
 
     /**
@@ -118,22 +120,18 @@ class ErrorNotifier extends Module
 
     /**
      * Sets live error reporting
+     * @param string $template
      * @param array $data
      * @param \gplcart\core\Controller $controller
      */
-    protected function setLiveReport(array &$data, $controller)
+    protected function setLiveReport($template, array &$data, $controller)
     {
-        $settings = $this->config->module('error_notifier');
-        $messages = $this->getLiveErrors($settings, $controller);
+        $allowed_template = 'layout/body';
 
-        if (empty($messages)) {
-            return null;
-        }
-
-        $this->prepareMessages($messages, $settings, $controller);
-
-        foreach ($messages as $message) {
-            $data['_messages']['warning'][] = $message;
+        if (substr($template, -strlen($allowed_template)) === $allowed_template) {
+            foreach ($this->getLiveErrors($controller) as $message) {
+                $data['_messages']['warning'][] = $message;
+            }
         }
     }
 
@@ -142,12 +140,12 @@ class ErrorNotifier extends Module
      * @param array $messages
      * @param array $settings
      * @param \gplcart\core\Controller $controller
+     * @return array
      */
     protected function prepareMessages(&$messages, $settings, $controller)
     {
-        if ($controller->path('^admin/report/events$')) {
-            $messages = array(); // Suppress errors on admin/report/events page
-            return null;
+        if (empty($messages) || $controller->path('^admin/report/events$')) {
+            return $messages = array(); // Suppress errors on admin/report/events page
         }
 
         $remaining = count($messages) - $settings['live_limit'];
@@ -158,24 +156,29 @@ class ErrorNotifier extends Module
         }
 
         if ($controller->access('report_events')) {
-            $message = $controller->text('<a href="@href">see saved errors</a>', array('@href' => $controller->url('admin/report/events', array('type' => 'php_error'))));
+
+            $message = $controller->text('<a href="@url">see saved errors</a>', array('@url' => $controller->url('admin/report/events', array('type' => 'php_error'))));
+
             if ($settings['live'] == 2) {
-                $vars = array('@href' => $controller->url('admin/report/events', array('clear' => true, 'target' => $controller->path())));
-                $message .= ' | ' . $controller->text('<a href="@href">clear all saved errors</a>', $vars);
+                $vars = array('@url' => $controller->url('admin/report/events', array('clear' => true, 'target' => $controller->path())));
+                $message .= ' | ' . $controller->text('<a href="@url">clear all saved errors</a>', $vars);
             }
 
             $messages[] = $message;
         }
+
+        return $messages;
     }
 
     /**
      * Returns an array of PHP errors for live reporting
-     * @param array $settings
      * @param \gplcart\core\Controller $controller
      * @return array
      */
-    protected function getLiveErrors(array $settings, $controller)
+    protected function getLiveErrors($controller)
     {
+        $settings = $this->config->module('error_notifier');
+
         if (empty($settings['live'])) {
             return array();
         }
@@ -190,7 +193,10 @@ class ErrorNotifier extends Module
             $errors = $logger->selectPhpErrors();
         }
 
-        return $this->getFormattedErrors($errors, $controller);
+        $messages = $this->getFormattedErrors($errors, $controller);
+        $this->prepareMessages($messages, $settings, $controller);
+
+        return $messages;
     }
 
     /**
@@ -203,11 +209,13 @@ class ErrorNotifier extends Module
     {
         $messages = array();
         foreach ($errors as $error) {
+
             $vars = array(
                 '@line' => $error['line'],
                 '@message' => $error['message'],
                 '@file' => gplcart_relative_path($error['file'])
             );
+
             $messages[] = $controller->text('@message on line @line in @file', $vars);
         }
 
