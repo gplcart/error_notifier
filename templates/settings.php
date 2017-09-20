@@ -16,7 +16,7 @@
         <option value="1"<?php echo isset($settings['live']) && $settings['live'] == 1 ? ' selected' : ''; ?>><?php echo $this->text('Only current errors'); ?></option>
         <option value="2"<?php echo isset($settings['live']) && $settings['live'] == 2 ? ' selected' : ''; ?>><?php echo $this->text('All saved errors'); ?></option>
       </select>
-      <div class="help-block"><?php echo $this->text('Select which PHP errors to show in live report'); ?></div>
+      <div class="help-block"><?php echo $this->text('Select which PHP errors must be shown in live report'); ?></div>
     </div>
   </div>
   <div class="form-group required<?php echo $this->error('live_limit', ' has-error'); ?>">
@@ -26,7 +26,7 @@
       <div class="help-block">
         <?php echo $this->error('live_limit'); ?>
         <div class="text-muted">
-          <?php echo $this->text('Max number of errors to show for live reporting'); ?>
+          <?php echo $this->text('Max number of errors to be shown in live report'); ?>
         </div>
       </div>
     </div>

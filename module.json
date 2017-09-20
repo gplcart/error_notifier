@@ -1,7 +1,7 @@
 {
-    "name": "Error Notifier",
+    "name": "Error notifier",
     "version": "1.0.0-dev",
-    "description": "Extends GPL Cart error logging system",
+    "description": "Extends the system error logging system",
     "author": "Iurii Makukh <gplcart.software@gmail.com>",
     "core": "1.x",
     "license": "GPL-3.0+",
