@@ -213,7 +213,7 @@ class ErrorNotifier extends Module
             $vars = array(
                 '@line' => $error['line'],
                 '@message' => $error['message'],
-                '@file' => gplcart_relative_path($error['file'])
+                '@file' => gplcart_path_relative($error['file'])
             );
 
             $messages[] = $controller->text('@message on line @line in @file', $vars);
