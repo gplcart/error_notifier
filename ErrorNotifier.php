@@ -113,7 +113,7 @@ class ErrorNotifier extends Module
 
         /* @var $logger \gplcart\core\Logger */
         $logger = $this->getInstance('gplcart\\core\\Logger');
-        $errors = $logger->selectPhpErrors($settings['email_limit']);
+        $errors = $logger->selectErrors($settings['email_limit']);
 
         return $this->getFormattedErrors($errors, $controller);
     }
@@ -188,9 +188,9 @@ class ErrorNotifier extends Module
 
         $errors = array();
         if ($settings['live'] == 1) {
-            $errors = $logger->getPhpErrors(false);
+            $errors = $logger->getErrors(false);
         } else if ($settings['live'] == 2) {
-            $errors = $logger->selectPhpErrors();
+            $errors = $logger->selectErrors();
         }
 
         $messages = $this->getFormattedErrors($errors, $controller);
