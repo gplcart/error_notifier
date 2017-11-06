@@ -9,7 +9,8 @@
 
 namespace gplcart\modules\error_notifier;
 
-use gplcart\core\Module;
+use gplcart\core\Module,
+    gplcart\core\Config;
 
 /**
  * Main class for Error Notifier module
@@ -18,11 +19,11 @@ class ErrorNotifier extends Module
 {
 
     /**
-     * Constructor
+     * @param Config $config
      */
-    public function __construct()
+    public function __construct(Config $config)
     {
-        parent::__construct();
+        parent::__construct($config);
     }
 
     /**
@@ -66,7 +67,7 @@ class ErrorNotifier extends Module
      */
     protected function setEmailReport($controller)
     {
-        $settings = $this->config->module('error_notifier');
+        $settings = $this->config->getFromModule('error_notifier');
 
         if (empty($settings['email']) || empty($settings['recipient'])) {
             return false;
@@ -177,7 +178,7 @@ class ErrorNotifier extends Module
      */
     protected function getLiveErrors($controller)
     {
-        $settings = $this->config->module('error_notifier');
+        $settings = $this->config->getFromModule('error_notifier');
 
         if (empty($settings['live'])) {
             return array();

@@ -42,7 +42,7 @@ class Settings extends BackendController
         $this->setTitleEditSettings();
         $this->setBreadcrumbEditSettings();
 
-        $this->setData('settings', $this->config->module('error_notifier'));
+        $this->setData('settings', $this->config->getFromModule('error_notifier'));
 
         $this->submitSettings();
         $this->prepareDataEditSettings();
