@@ -10,20 +10,35 @@
 namespace gplcart\modules\error_notifier;
 
 use gplcart\core\Module,
-    gplcart\core\Config;
+    gplcart\core\Logger,
+    gplcart\core\Container;
 
 /**
  * Main class for Error Notifier module
  */
-class ErrorNotifier extends Module
+class ErrorNotifier
 {
 
     /**
-     * @param Config $config
+     * Logger class instance
+     * @var \gplcart\core\Logger $logger
      */
-    public function __construct(Config $config)
+    protected $logger;
+
+    /**
+     * Module class instance
+     * @var \gplcart\core\Module $module
+     */
+    protected $module;
+
+    /**
+     * @param Logger $logger
+     * @param Module $module
+     */
+    public function __construct(Logger $logger, Module $module)
     {
-        parent::__construct($config);
+        $this->logger = $logger;
+        $this->module = $module;
     }
 
     /**
@@ -67,7 +82,7 @@ class ErrorNotifier extends Module
      */
     protected function setEmailReport($controller)
     {
-        $settings = $this->config->getFromModule('error_notifier');
+        $settings = $this->module->getSettings('error_notifier');
 
         if (empty($settings['email']) || empty($settings['recipient'])) {
             return false;
@@ -90,13 +105,12 @@ class ErrorNotifier extends Module
      */
     protected function sendEmail(array $settings, array $messages, $controller)
     {
-        /* @var $mailer \gplcart\core\models\Mail */
-        $mailer = $this->getModel('Mail');
-
         $subject = 'Last PHP errors';
         $body = implode("\r\n", $messages);
         $from = $controller->getStore('data.email.0');
 
+        /* @var $mailer \gplcart\core\models\Mail */
+        $mailer = Container::get('gplcart\\core\\models\\Mail');
         $mailer->send($settings['recipient'], $subject, $body, $from);
     }
 
@@ -112,10 +126,7 @@ class ErrorNotifier extends Module
             $settings['email_limit'] = null; // Unlimited
         }
 
-        /* @var $logger \gplcart\core\Logger */
-        $logger = $this->getInstance('gplcart\\core\\Logger');
-        $errors = $logger->selectErrors($settings['email_limit']);
-
+        $errors = $this->logger->selectErrors($settings['email_limit']);
         return $this->getFormattedErrors($errors, $controller);
     }
 
@@ -128,7 +139,6 @@ class ErrorNotifier extends Module
     protected function setLiveReport($template, array &$data, $controller)
     {
         $allowed_template = 'layout/body';
-
         if (substr($template, -strlen($allowed_template)) === $allowed_template) {
             foreach ($this->getLiveErrors($controller) as $message) {
                 $data['_messages']['warning'][] = $message;
@@ -157,9 +167,7 @@ class ErrorNotifier extends Module
         }
 
         if ($controller->access('report_events')) {
-
             $message = $controller->text('<a href="@url">see saved errors</a>', array('@url' => $controller->url('admin/report/events', array('type' => 'php_error'))));
-
             if ($settings['live'] == 2) {
                 $vars = array('@url' => $controller->url('admin/report/events', array('clear' => true, 'target' => $controller->path())));
                 $message .= ' | ' . $controller->text('<a href="@url">clear all saved errors</a>', $vars);
@@ -178,25 +186,21 @@ class ErrorNotifier extends Module
      */
     protected function getLiveErrors($controller)
     {
-        $settings = $this->config->getFromModule('error_notifier');
+        $settings = $this->module->getSettings('error_notifier');
 
         if (empty($settings['live'])) {
             return array();
         }
 
-        /* @var $logger \gplcart\core\Logger */
-        $logger = $this->getInstance('gplcart\\core\\Logger');
-
         $errors = array();
         if ($settings['live'] == 1) {
-            $errors = $logger->getErrors(false);
+            $errors = $this->logger->getErrors(false);
         } else if ($settings['live'] == 2) {
-            $errors = $logger->selectErrors();
+            $errors = $this->logger->selectErrors();
         }
 
         $messages = $this->getFormattedErrors($errors, $controller);
         $this->prepareMessages($messages, $settings, $controller);
-
         return $messages;
     }
 
