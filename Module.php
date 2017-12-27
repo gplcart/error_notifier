@@ -9,14 +9,14 @@
 
 namespace gplcart\modules\error_notifier;
 
-use gplcart\core\Module,
-    gplcart\core\Logger,
-    gplcart\core\Container;
+use gplcart\core\Logger,
+    gplcart\core\Container,
+    gplcart\core\Module as CoreModule;
 
 /**
  * Main class for Error Notifier module
  */
-class ErrorNotifier
+class Module
 {
 
     /**
@@ -33,9 +33,9 @@ class ErrorNotifier
 
     /**
      * @param Logger $logger
-     * @param Module $module
+     * @param CoreModule $module
      */
-    public function __construct(Logger $logger, Module $module)
+    public function __construct(Logger $logger, CoreModule $module)
     {
         $this->logger = $logger;
         $this->module = $module;
