@@ -102,6 +102,7 @@ class Module
      * @param array $settings
      * @param array $messages
      * @param \gplcart\core\Controller $controller
+     * @return bool
      */
     protected function sendEmail(array $settings, array $messages, $controller)
     {
@@ -111,7 +112,7 @@ class Module
 
         /* @var $mailer \gplcart\core\models\Mail */
         $mailer = Container::get('gplcart\\core\\models\\Mail');
-        $mailer->send($settings['recipient'], $subject, $body, $from);
+        return (bool) $mailer->send($settings['recipient'], $subject, $body, $from);
     }
 
     /**
