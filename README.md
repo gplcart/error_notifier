@@ -1,6 +1,7 @@
 [![Build Status](https://scrutinizer-ci.com/g/gplcart/error_notifier/badges/build.png?b=master)](https://scrutinizer-ci.com/g/gplcart/error_notifier/build-status/master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/gplcart/error_notifier/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/gplcart/error_notifier/?branch=master)
 
+## ABANDONED!
 Error Notifier is a [GPL Cart](https://github.com/gplcart/gplcart) module that helps to better control PHP errors on your site and fix them as soon as possible.
 
 **Features:**
