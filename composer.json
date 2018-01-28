@@ -1,12 +1,18 @@
 {
-    "name": "gplcart/error_notifier",
-    "type": "gplcart-module",
-    "description": "Extends GPL Cart error logging system",
-    "keywords": ["gplcart", "ecommerce", "shopping cart", "gplcart module", "php"],
-    "license": "GPL-3.0+",
-    "require": {
-        "gplcart/composer-module-installer": "*"
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+  "name": "gplcart/error_notifier",
+  "type": "gplcart-module",
+  "description": "Extends GPL Cart error logging system",
+  "keywords": [
+    "gplcart",
+    "ecommerce",
+    "shopping cart",
+    "gplcart module",
+    "php"
+  ],
+  "license": "GPL-3.0-or-later",
+  "require": {
+    "gplcart/composer-module-installer": "*"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }
